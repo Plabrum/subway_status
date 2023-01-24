@@ -1,5 +1,4 @@
 export function parse_time(isotime: string): string {
-  console.log("time", isotime);
   interface mmDict<T> {
     [Key: string]: T;
   }

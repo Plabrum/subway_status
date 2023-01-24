@@ -1,41 +1,36 @@
 import { train_colors } from "@/Utils/helpers";
 import { useState, useEffect, Suspense } from "react";
-import ReportList, { IncomingType, TrainListProps } from "./ReportList";
-
-function Loading() {
-  return (
-    <div className="h-54 flex">
-      <h1>Loading...</h1>
-    </div>
-  );
-}
+import ReportList, {
+  emptyTrainReport,
+  IncomingType,
+  TrainListProps,
+} from "./ReportList";
 
 export function TrainList() {
-  const [rawdata, setRawData] = useState(null);
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(true);
+  const [data, setData] = useState<IncomingType[]>(emptyTrainReport());
 
   useEffect(() => {
-    setLoading(true);
     fetch(
       "https://faas-nyc1-2ef2e6cc.doserverless.co/api/v1/web/fn-9eca26dd-80e1-48a4-9992-8f4f60a7accb/subway_status_api/reports"
-      // { next: { revalidate: 10 } }
+      //   { next: { revalidate: 10 } }
     )
       .then((res) => res.json())
-      .then((rawdata) => {
-        setRawData(rawdata);
+      .then((data) => {
+        setData(data);
         setLoading(false);
       });
   }, []);
 
-  if (isLoading) return <p>Loading...</p>;
-  if (!rawdata) return <p>No train data found</p>;
-  else {
-    const data: IncomingType[] = rawdata;
-    return (
-      <div className="">
-        <div className="grid grid-cols-12 text-center text-3xl font-mono m-8">
-          <h1 className="col-span-2">Trains</h1>
-          <h1 className="col-span-10">Current Reports</h1>
+  // const data: IncomingType[] = rawdata;
+  return (
+    <div className="">
+      <div className="grid grid-cols-5 sm:gap-x-20 sm:gap-y-2 gap-y-1">
+        <div className="col-span-1 ">
+          <h1 className=" sm:text-3xl text-2xl text-center">Trains</h1>
+        </div>
+        <div className="col-span-4 ">
+          <h1 className=" sm:text-3xl text-2xl text-center">Current Reports</h1>
         </div>
 
         {data.map((element, index) => {
@@ -43,28 +38,27 @@ export function TrainList() {
           const reports: TrainListProps = element.all_reports;
           const trainStyle: string = train_colors(train);
           return (
-            <div key={index} className="grid grid-cols-12">
-              <div className="col-span-2 text-center items-center">
+            <>
+              <div className="col-span-1 flex items-center text-center">
                 <h1
-                  className={`inline-block text-3xl px-4 py-2 border border-2 rounded-full m-2 ${trainStyle}`}
+                  className={`inline-block sm:text-3xl text-xl px-4 py-2 border-2 mx-auto rounded-full ${trainStyle}`}
                 >
                   {train}
                 </h1>
               </div>
-              <div className="col-span-10 align-middle">
+              <div className="col-span-4 flex items-center sm:pl-8 pl-2">
                 <ReportList
-                  breaking={reports.breaking}
-                  current={reports.current}
-                  future={reports.future}
-                  past={reports.past}
+                  reports={reports}
+                  isLoading={isLoading}
+                  pclassName={"my-2"}
                 />
               </div>
-            </div>
+            </>
           );
         })}
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 // function Trains2() {

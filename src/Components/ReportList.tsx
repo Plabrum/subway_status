@@ -1,5 +1,62 @@
 import { parse_time } from "@/Utils/helpers";
 
+export default function ReportList({
+  reports,
+  isLoading,
+  pclassName,
+}: {
+  reports: TrainListProps;
+  isLoading: boolean;
+  pclassName: string;
+}) {
+  const { breaking, current, future, past } = reports;
+  const breaking_count = breaking.length;
+  const current_count = current.length;
+  const future_count = future.length;
+  if (isLoading) {
+    return (
+      <div>
+        <h1 className={`text-yellow-200 ${pclassName}`}>Loading ...</h1>
+      </div>
+    );
+  } else if (breaking_count > 0 || current_count > 0) {
+    return (
+      <>
+        {current.map((val, index) => {
+          var start_time = parse_time(val.start);
+          const report = val.report;
+          return (
+            // <div key={index}>
+            <h1 key={index} className={`text-white ${pclassName}`}>
+              <span className="text-blue-300 mr-2">{start_time}</span>
+              {report}
+            </h1>
+            // </div>
+          );
+        })}
+        {breaking.map((val, index) => {
+          var start_time = parse_time(val.start);
+          const report = val.report;
+          return (
+            // <div key={index}>
+            <h1 key={index} className={`text-white ${pclassName}`}>
+              <span className="text-red-300 mr-2">{start_time}</span>
+              {report}
+            </h1>
+            // </div>
+          );
+        })}
+      </>
+    );
+  } else {
+    return (
+      // <div>
+      <h1 className={`text-green-500 ${pclassName}`}>Service Good</h1>
+      // </div>
+    );
+  }
+}
+
 interface reportType {
   start: string;
   end: string;
@@ -18,58 +75,46 @@ export interface IncomingType {
   all_reports: TrainListProps;
 }
 
-export default function ReportList({
-  breaking,
-  current,
-  future,
-  past,
-}: TrainListProps) {
-  const breaking_count = breaking.length;
-  const current_count = current.length;
-  const future_count = current.length;
-  console.log(
-    "Breaking Count",
-    breaking_count,
-    "current count",
-    current_count,
-    "future count",
-    future_count
-  );
-
-  if (breaking_count > 0 || current_count > 0) {
-    return (
-      <>
-        {current.map((val, index) => {
-          var start_time = parse_time(val.start);
-          const report = val.report;
-          return (
-            <div key={index}>
-              <h1 className="text-white">
-                <span className="text-blue-300 mr-2">{start_time}</span>
-                {report}
-              </h1>
-            </div>
-          );
-        })}
-        {breaking.map((val, index) => {
-          var start_time = parse_time(val.start);
-          const report = val.report;
-          return (
-            <div key={index}>
-              <h1 className="text-white">
-                <span className="text-red-300 mr-2">{start_time}</span>
-                {report}
-              </h1>
-            </div>
-          );
-        })}
-      </>
-    );
-  } else {
-    return (
-      <div>
-        <h1 className="text-green-500">Service Good</h1>
-      </div>
-    );
-  }
+export function emptyTrainReport(): IncomingType[] {
+  const empty_train_report: TrainListProps = {
+    breaking: Array(),
+    current: Array(),
+    future: Array(),
+    past: Array(),
+  };
+  return [
+    { train: "A", all_reports: empty_train_report },
+    { train: "C", all_reports: empty_train_report },
+    { train: "E", all_reports: empty_train_report },
+    //
+    { train: "B", all_reports: empty_train_report },
+    { train: "D", all_reports: empty_train_report },
+    { train: "F", all_reports: empty_train_report },
+    { train: "M", all_reports: empty_train_report },
+    //
+    { train: "G", all_reports: empty_train_report },
+    //
+    { train: "L", all_reports: empty_train_report },
+    //
+    { train: "J", all_reports: empty_train_report },
+    { train: "Z", all_reports: empty_train_report },
+    //
+    { train: "N", all_reports: empty_train_report },
+    { train: "Q", all_reports: empty_train_report },
+    { train: "R", all_reports: empty_train_report },
+    { train: "W", all_reports: empty_train_report },
+    //
+    { train: "1", all_reports: empty_train_report },
+    { train: "3", all_reports: empty_train_report },
+    { train: "2", all_reports: empty_train_report },
+    //
+    { train: "4", all_reports: empty_train_report },
+    { train: "5", all_reports: empty_train_report },
+    { train: "6", all_reports: empty_train_report },
+    //
+    { train: "7", all_reports: empty_train_report },
+    //
+    { train: "GS", all_reports: empty_train_report },
+    { train: "SI", all_reports: empty_train_report },
+  ];
 }
