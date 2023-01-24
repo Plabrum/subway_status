@@ -12,21 +12,19 @@ export default function Home() {
           content="A simple site to get MTA Subway informtion"
         />
       </Head>
-      <div className="bg-black">
+      <div className=" bg-gray-900">
         <main className="text-white font-bold">
           <h1 className="text-center text-4xl p-8 font-mono">
             Instant MTA Subway Information
           </h1>
-          <div className="w-3/4 mx-auto">
+          <div className="">
             <TrainList />
           </div>
         </main>
       </div>
 
       <div className="my-8">
-        <h3 className="text-gray-300 text-center">
-          Simple App by Phil Labrum - 2023
-        </h3>
+        <h3 className="text-gray-300 text-center">App by Phil Labrum - 2023</h3>
       </div>
     </>
   );

@@ -28,7 +28,7 @@ export default function ReportList({
           return (
             // <div key={index}>
             <h1 key={index} className={`text-white ${pclassName}`}>
-              <span className="text-blue-300 mr-2">{start_time}</span>
+              <span className="text-blue-300 mr-2">Notice {start_time}</span>
               {report}
             </h1>
             // </div>
@@ -40,7 +40,7 @@ export default function ReportList({
           return (
             // <div key={index}>
             <h1 key={index} className={`text-white ${pclassName}`}>
-              <span className="text-red-300 mr-2">{start_time}</span>
+              <span className="text-red-300 mr-2">Alert {start_time}</span>
               {report}
             </h1>
             // </div>

@@ -11,9 +11,10 @@ export function TrainList() {
   const [data, setData] = useState<IncomingType[]>(emptyTrainReport());
 
   useEffect(() => {
+    setLoading(false);
     fetch(
-      "https://faas-nyc1-2ef2e6cc.doserverless.co/api/v1/web/fn-9eca26dd-80e1-48a4-9992-8f4f60a7accb/subway_status_api/reports"
-      //   { next: { revalidate: 10 } }
+      "https://faas-nyc1-2ef2e6cc.doserverless.co/api/v1/web/fn-9eca26dd-80e1-48a4-9992-8f4f60a7accb/subway_status_api/reports",
+      { next: { revalidate: 10 } }
     )
       .then((res) => res.json())
       .then((data) => {
@@ -24,12 +25,12 @@ export function TrainList() {
 
   // const data: IncomingType[] = rawdata;
   return (
-    <div className="">
-      <div className="grid grid-cols-5 sm:gap-x-20 sm:gap-y-2 gap-y-1">
-        <div className="col-span-1 ">
+    <div className="sm:w-3/4 ml-10 mr-3">
+      <div className="grid grid-cols-5 sm:gap-x-20 gap-x-6 sm:gap-y-2 gap-y-2">
+        <div className="col-span-1 mb-4">
           <h1 className=" sm:text-3xl text-2xl text-center">Trains</h1>
         </div>
-        <div className="col-span-4 ">
+        <div className="col-span-4 mb-4">
           <h1 className=" sm:text-3xl text-2xl text-center">Current Reports</h1>
         </div>
 
