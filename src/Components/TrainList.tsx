@@ -25,7 +25,7 @@ export function TrainList() {
 
   // const data: IncomingType[] = rawdata;
   return (
-    <div className="sm:w-3/4 ml-10 mr-3">
+    <div className="sm:w-2/3 sm:mx-auto ml-10 mr-3">
       <div className="grid grid-cols-5 sm:gap-x-20 gap-x-6 sm:gap-y-2 gap-y-2">
         <div className="col-span-1 mb-4">
           <h1 className=" sm:text-3xl text-2xl text-center">Trains</h1>
