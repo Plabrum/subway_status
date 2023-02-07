@@ -51,7 +51,7 @@ export default function ReportList({
   } else {
     return (
       // <div>
-      <h1 className={`text-green-500 ${pclassName}`}>Service Good</h1>
+      <h1 className={` text-green-500 ${pclassName}`}>Service Good</h1>
       // </div>
     );
   }
