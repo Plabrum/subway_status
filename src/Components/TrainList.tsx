@@ -1,17 +1,14 @@
+'use client'
 import { train_colors } from "@/Utils/helpers";
 import { useState, useEffect, Suspense } from "react";
-import ReportList, {
-  emptyTrainReport,
-  IncomingType,
-  TrainListProps,
-} from "./ReportList";
+import ReportList, { IncomingType, emptyTrainReport, TrainListProps } from "./ReportList";
+
 
 export function TrainList() {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState<IncomingType[]>(emptyTrainReport());
 
   useEffect(() => {
-    // setLoading(false);
     fetch(
       "https://faas-nyc1-2ef2e6cc.doserverless.co/api/v1/web/fn-9eca26dd-80e1-48a4-9992-8f4f60a7accb/subway_status_api/reports",
       { next: { revalidate: 10 } }
@@ -23,7 +20,7 @@ export function TrainList() {
       });
   }, []);
 
-  // const data: IncomingType[] = rawdata;
+  
   return (
     <div className="sm:w-2/3 sm:mx-auto mx-3">
       <div className="grid grid-cols-5 sm:gap-x-20 gap-x-6 sm:gap-y-2 gap-y-2">
@@ -64,34 +61,3 @@ export function TrainList() {
     </div>
   );
 }
-
-// function Trains2() {
-//   const [data, setData] = useState(null);
-//   const [isLoading, setLoading] = useState(false);
-
-//   useEffect(() => {
-//     setLoading(true);
-//     fetch(
-//       "https://faas-nyc1-2ef2e6cc.doserverless.co/api/v1/web/fn-9eca26dd-80e1-48a4-9992-8f4f60a7accb/subway_status/times",
-//       { next: { revalidate: 10 } }
-//     )
-//       .then((res) => res.json())
-//       .then((data) => {
-//         setData(data);
-//         setLoading(false);
-//       });
-//   }, []);
-//   console.log(data);
-//   if (isLoading) return <p>Loading...</p>;
-//   if (!data) return <p>No train data found</p>;
-
-//   return (
-//     <div className="grid grid-cols-12 place-items-center">
-//       <Suspense fallback={<Loading />}>
-//         <div className="">
-//           {Object.values(data).forEach((key, index) => {})}
-//         </div>
-//       </Suspense>
-//     </div>
-//   );
-// }
