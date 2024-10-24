@@ -1,3 +1,12 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": ["next/core-web-vitals", "eslint:recommended", "prettier"],
+  "rules": {
+    "semi": ["error", "never"],
+    "no-console": "warn"
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": "latest"
+  },
+  "ignorePatterns": ["node_modules", "build", "dist", "public"]
 }
