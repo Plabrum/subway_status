@@ -1,12 +1,15 @@
 {
-  "extends": ["next/core-web-vitals", "eslint:recommended", "prettier"],
+  "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/strict", "prettier"],
+  "plugins": ["@typescript-eslint"],
   "rules": {
     "semi": ["error", "never"],
     "no-console": "warn"
   },
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": "latest"
+    "ecmaVersion": "latest",
+    "project": "./tsconfig.json" // Enable rules requiring type information
   },
   "ignorePatterns": ["node_modules", "build", "dist", "public"]
 }
