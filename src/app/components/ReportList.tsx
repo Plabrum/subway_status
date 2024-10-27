@@ -25,37 +25,35 @@ export default function ReportList({
     return (
       <>
         {current.map((val, index) => {
-          var start_time = parse_time(val.start)
+          const start_time = parse_time(val.start)
           const report = val.report
           return (
-            // <div key={index}>
-            <h1 key={index} className={`text-white ${pclassName}`}>
-              <span className="text-blue-300 mr-2">Notice {start_time}</span>
+            <h1
+              key={index}
+              className={`text-white ${pclassName}`}
+            >
+              <span className="mr-2 text-blue-300">Notice {start_time}</span>
               {report}
             </h1>
-            // </div>
           )
         })}
         {breaking.map((val, index) => {
-          var start_time = parse_time(val.start)
+          const start_time = parse_time(val.start)
           const report = val.report
           return (
-            // <div key={index}>
-            <h1 key={index} className={`text-white ${pclassName}`}>
-              <span className="text-red-300 mr-2">Alert {start_time}</span>
+            <h1
+              key={index}
+              className={`text-white ${pclassName}`}
+            >
+              <span className="mr-2 text-red-300">Alert {start_time}</span>
               {report}
             </h1>
-            // </div>
           )
         })}
       </>
     )
   } else {
-    return (
-      // <div>
-      <h1 className={` text-green-500 ${pclassName}`}>Service Good</h1>
-      // </div>
-    )
+    return <h1 className={`text-green-500 ${pclassName}`}>Service Good</h1>
   }
 }
 
@@ -79,10 +77,10 @@ export interface IncomingType {
 
 export function emptyTrainReport(): IncomingType[] {
   const empty_train_report: TrainListProps = {
-    breaking: Array(),
-    current: Array(),
-    future: Array(),
-    past: Array()
+    breaking: [],
+    current: [],
+    future: [],
+    past: []
   }
   return [
     { train: 'A', all_reports: empty_train_report },
