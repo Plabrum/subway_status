@@ -1,4 +1,4 @@
-import { parse_time } from '@/Utils/helpers'
+import { parse_time } from 'app/utils/helpers'
 
 export default function ReportList({
   reports,
@@ -14,7 +14,7 @@ export default function ReportList({
   const current_count = current.length
   const future_count = future.length
   // Unused in this version:
-  console.log('past', past, future_count)
+  console.log(past, future_count)
   if (isLoading) {
     return (
       <div>
