@@ -5,28 +5,32 @@ import ReportList, { emptyTrainReport, IncomingType, TrainListProps } from './Re
 
 export function TrainList() {
   const [isLoading, setLoading] = useState(true)
+  const [isError, setError] = useState(false)
   const [data, setData] = useState<IncomingType[]>(emptyTrainReport())
 
   useEffect(() => {
-    fetch(
-      'https://faas-nyc1-2ef2e6cc.doserverless.co/api/v1/web/fn-9eca26dd-80e1-48a4-9992-8f4f60a7accb/subway_status_api/reports',
-      { next: { revalidate: 10 } }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data)
-        setLoading(false)
+    fetch('/api/alerts', { next: { revalidate: 10 } })
+      .then(async res => {
+        try {
+          const json = await res.json()
+          setData(json)
+        } catch (err) {
+          setError(true)
+          console.error('On Json Fetch', err)
+        }
       })
+      .catch(err => console.error(err))
+      .finally(() => setLoading(false))
   }, [])
 
   return (
-    <div className="sm:w-2/3 sm:mx-auto mx-3">
-      <div className="grid grid-cols-5 sm:gap-x-20 gap-x-6 sm:gap-y-2 gap-y-2">
+    <div className="mx-3 sm:mx-auto sm:w-2/3">
+      <div className="grid grid-cols-5 gap-x-6 gap-y-2 sm:gap-x-20 sm:gap-y-2">
         <div className="col-span-1 mb-4">
-          <h1 className=" sm:text-3xl text-2xl text-center">Trains</h1>
+          <h1 className="text-center text-2xl sm:text-3xl">Trains</h1>
         </div>
         <div className="col-span-4 mb-4">
-          <h1 className=" sm:text-3xl text-2xl text-center">Current Reports</h1>
+          <h1 className="text-center text-2xl sm:text-3xl">Current Reports</h1>
         </div>
       </div>
 
@@ -37,15 +41,23 @@ export function TrainList() {
         return (
           <div
             key={index}
-            className="grid grid-cols-5 max-md:border max-md:border-gray-500 max-md:rounded-lg sm:my-0 my-4 py-3"
+            className="my-4 grid grid-cols-5 py-3 max-md:rounded-lg max-md:border max-md:border-gray-500 sm:my-0"
           >
             <div className="col-span-1 flex items-center text-center">
-              <h1 className={`inline-block sm:text-3xl text-xl px-4 py-2 border-2 mx-auto rounded-full ${trainStyle}`}>
+              <h1 className={`mx-auto inline-block rounded-full border-2 px-4 py-2 text-xl sm:text-3xl ${trainStyle}`}>
                 {train}
               </h1>
             </div>
-            <div className="col-span-4 flex-row my-auto items-center">
-              <ReportList reports={reports} isLoading={isLoading} pclassName={'my-1'} />
+            <div className="col-span-4 my-auto flex-row items-center">
+              {isError ? (
+                <h1 className="text-red-500">Error</h1>
+              ) : (
+                <ReportList
+                  reports={reports}
+                  isLoading={isLoading}
+                  pclassName={'my-1'}
+                />
+              )}
             </div>
           </div>
         )

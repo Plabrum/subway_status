@@ -14,7 +14,7 @@ export default function ReportList({
   const current_count = current.length
   const future_count = future.length
   // Unused in this version:
-  console.log('past', past, future_count)
+  console.log(past, future_count)
   if (isLoading) {
     return (
       <div>
