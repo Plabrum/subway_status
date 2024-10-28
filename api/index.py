@@ -129,7 +129,7 @@ def get_alerts(mta_key, json_out=False) -> dict:
         ]
 
 
-@app.route("/alerts", methods=["GET"])
+@app.route("/api/alerts", methods=["GET"])
 def alerts():
     mta_key = os.environ.get("mta_key")
     json_out = request.args.get("json_out", "false").lower() == "true"

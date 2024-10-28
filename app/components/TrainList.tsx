@@ -1,5 +1,5 @@
 'use client'
-import { train_colors } from '@/Utils/helpers'
+import { train_colors } from 'app/utils/helpers'
 import { useEffect, useState } from 'react'
 import ReportList, { emptyTrainReport, IncomingType, TrainListProps } from './ReportList'
 

@@ -1,4 +1,4 @@
-import { parse_time } from '@/Utils/helpers'
+import { parse_time } from 'app/utils/helpers'
 
 export default function ReportList({
   reports,

@@ -6,7 +6,7 @@
     "node": "20.x"
   },
   "scripts": {
-    "flask-dev": "source venv/bin/activate && pip install -r requirements.txt && python3 -m flask --app src/app/api/index.py run -p 8000",
+    "flask-dev": "source venv/bin/activate && pip install -r requirements.txt && python3 -m flask --app api/index.py run -p 8000",
     "next-dev": "next dev",
     "dev": "concurrently \"npm run next-dev\" \"npm run flask-dev\"",
     "build": "next build",
