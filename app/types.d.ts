@@ -28,15 +28,20 @@ export interface components {
         /** AlertsResponse */
         AlertsResponse: {
             train: string;
-            all_reports: {
-                [key: string]: components["schemas"]["Report"][];
-            };
+            all_reports: components["schemas"]["ReportType"];
         };
         /** Report */
         Report: {
             start?: null | string;
             end?: null | string;
             report?: null | string;
+        };
+        /** ReportType */
+        ReportType: {
+            current: components["schemas"]["Report"][];
+            future: components["schemas"]["Report"][];
+            past: components["schemas"]["Report"][];
+            breaking: components["schemas"]["Report"][];
         };
     };
     responses: never;

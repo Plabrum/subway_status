@@ -1,6 +1,6 @@
 import os
 import datetime
-from typing import Optional, List, Dict, Union
+from typing import Optional, List, Dict, Union, TypedDict
 from litestar import Litestar, get
 from litestar.exceptions import HTTPException
 from pydantic import BaseModel
@@ -40,6 +40,16 @@ ALL_TRAINS = [
 
 
 # Pydantic models for response validation
+# Define a strongly typed dictionary for report categories
+class ReportType(TypedDict):
+    """A dictionary of report categories."""
+
+    current: List["Report"]
+    future: List["Report"]
+    past: List["Report"]
+    breaking: List["Report"]
+
+
 class Report(BaseModel):
     """
     Represents an individual alert report with details about
@@ -67,7 +77,7 @@ class AlertsResponse(BaseModel):
     """
 
     train: str
-    all_reports: Dict[str, List[Report]]
+    all_reports: ReportType
 
 
 def utc_to_est(utc_dt: datetime.datetime, local_tz: pytz.timezone) -> datetime.datetime:
@@ -87,7 +97,7 @@ def nix_to_est(timestamp: str, local_tz: pytz.timezone) -> datetime.datetime:
 
 def get_alerts(
     mta_key: str, json_out: bool = False
-) -> Union[dict, List[AlertsResponse]]:
+) -> Union[Dict[str, ReportType], List[AlertsResponse]]:
     """Fetch and process alerts from the MTA API."""
     local_tz = pytz.timezone("US/Eastern")
     uri = "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json"
@@ -99,8 +109,10 @@ def get_alerts(
         raise HTTPException(status_code=500, detail=f"MTA API Error - {str(e)}") from e
 
     records = response.json().get("entity", [])
-    train_dict: Dict[str, Dict[str, List[Report]]] = {
-        train: {"current": [], "future": [], "past": [], "breaking": []}
+
+    # Initialize train_dict with the strongly typed structure
+    train_dict: Dict[str, ReportType] = {
+        train: ReportType(current=[], future=[], past=[], breaking=[])
         for train in ALL_TRAINS
     }
 
@@ -143,7 +155,7 @@ def get_alerts(
 
         for entity in informed_entities:
             train = entity.get("route_id")
-            if train in train_dict:
+            if train in train_dict and alert_type in train_dict[train]:
                 train_dict[train][alert_type].append(combined_report)
 
     if json_out:
