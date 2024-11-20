@@ -6,12 +6,13 @@
     "node": "20.x"
   },
   "scripts": {
-    "flask-dev": "source venv/bin/activate && pip install -r requirements.txt && python3 -m flask --app api/index.py run -p 8000",
+    "litestar-dev": "pipenv run litestar --app api.index:app run -r -p 8000",
     "next-dev": "next dev",
-    "dev": "concurrently \"npm run next-dev\" \"npm run flask-dev\"",
+    "dev": "concurrently \"npm run next-dev\" \"npm run litestar-dev\"",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --config eslint.config.mjs"
+    "lint": "next lint --config eslint.config.mjs",
+    "generate-types": "openapi-typescript http://localhost:8000/schema/openapi.json -o app/types.d.ts"
   },
   "dependencies": {
     "axios": "^1.7.7",
@@ -30,6 +31,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.6",
     "eslint-config-prettier": "^9.1.0",
+    "openapi-typescript": "^7.4.3",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.8",
     "tailwindcss": "^3.4.14",
