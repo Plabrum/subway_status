@@ -20,7 +20,7 @@ export function TrainList({ data }: { data: AlertsResponse[] }) {
       {data.map((element, index) => {
         const train: string = element.train
         const reports = element.all_reports
-        const trainStyle: string = train_colors(train)
+        const trainStyle: string | undefined = train_colors(train)
         return (
           <div
             key={index}

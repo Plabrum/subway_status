@@ -1,10 +1,11 @@
 import { TrainList } from 'app/components/TrainList'
 import { components } from './types' // Adjust the path to where your generated types are located
+import { getFullBackendURL } from './utils/helpers'
 
 type AlertsResponse = components['schemas']['AlertsResponse']
 
 async function getData(): Promise<AlertsResponse[]> {
-  const response = await fetch('/api/alerts')
+  const response = await fetch(getFullBackendURL() + '/api/alerts')
   if (!response.ok) {
     throw new Error('Failed to fetch alerts')
   }

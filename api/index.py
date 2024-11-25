@@ -1,17 +1,17 @@
-import os
 import datetime
-from typing import Optional, List, Dict, Union, TypedDict
+import os
+from typing import List, TypedDict
+
+import requests
+from dotenv import load_dotenv
 from litestar import Litestar, get
 from litestar.exceptions import HTTPException
 from pydantic import BaseModel
-import requests
-import pytz
-from dotenv import load_dotenv
 
-load_dotenv()
+from .stoplookup import stopLookup
 
 # List of all trains
-ALL_TRAINS = [
+ALL_TRAINS: List[str] = [
     "A",
     "C",
     "E",
@@ -40,14 +40,13 @@ ALL_TRAINS = [
 
 
 # Pydantic models for response validation
-# Define a strongly typed dictionary for report categories
-class ReportType(TypedDict):
-    """A dictionary of report categories."""
 
-    current: List["Report"]
-    future: List["Report"]
-    past: List["Report"]
-    breaking: List["Report"]
+
+class Stop(BaseModel):
+    """Represents an MTA stop"""
+
+    stop_id: str
+    stop_name: str
 
 
 class Report(BaseModel):
@@ -61,9 +60,39 @@ class Report(BaseModel):
         report (Optional[str]): The description or details of the alert.
     """
 
-    start: Optional[str]
-    end: Optional[str]
-    report: Optional[str]
+    start: str
+    end: str | None
+    report: str
+
+    alert_id: str
+    route_id: str
+    affected_stops: List[Stop]
+    alert_period: str
+    alert_start: str
+    alert_end: str | None
+    alert_type: str
+    alert_created: str
+    alert_updated: str
+    display_before_active: int | None
+    header_text: str
+    description_text: str | None
+
+
+class ReportType(TypedDict):
+    """
+    Represents the categorization of reports based on their time relevance.
+
+    Attributes:
+        past (List[Report]): Reports for alerts that have ended.
+        current (List[Report]): Reports for alerts that are currently active.
+        future (List[Report]): Reports for alerts scheduled for the future.
+        breaking (List[Report]): Reports for alerts with no defined end time.
+    """
+
+    past: List[Report]
+    current: List[Report]
+    future: List[Report]
+    breaking: List[Report]
 
 
 class AlertsResponse(BaseModel):
@@ -77,103 +106,158 @@ class AlertsResponse(BaseModel):
     """
 
     train: str
-    all_reports: ReportType
+    all_reports: ReportType = ReportType(
+        past=[],
+        current=[],
+        future=[],
+        breaking=[],
+    )
 
 
-def utc_to_est(utc_dt: datetime.datetime, local_tz: pytz.timezone) -> datetime.datetime:
-    """Convert UTC datetime to Eastern Time."""
-    return utc_dt.replace(tzinfo=pytz.utc).astimezone(local_tz)
+# Helpers
+def group_alerts_by_train_and_type(
+    entities: List[any], now: datetime.datetime
+) -> List[AlertsResponse]:
+    """
+    Groups alerts by train route and categorizes them by alert type.
+    """
+    routes_dict = {}
+    for entity in entities:
+        affected_routes = [
+            en.get("route_id")
+            for en in entity["alert"]["informed_entity"]
+            if en.get("route_id")
+        ]
+        alert_periods = [
+            (get_alert_type_by_times(now, period), period)
+            for period in entity["alert"].get("active_period")
+        ]
+        for route in affected_routes:
+            if route not in routes_dict:
+                routes_dict[route] = AlertsResponse(train=route)
+            for alert, periods in alert_periods:
+                try:
+                    report = parse_entity(entity, alert, periods, route)
+                except Exception as e:
+                    raise e
+                routes_dict[route].all_reports[alert].append(report)
+    return list(routes_dict.values())
 
 
-def nix_to_utc(timestamp: str) -> datetime.datetime:
-    """Convert a Unix timestamp to UTC datetime."""
-    return datetime.datetime.utcfromtimestamp(int(timestamp))
+def datetime_to_iso8601(dt: datetime.datetime) -> str:
+    """Converts a datetime object to an ISO 8601-formatted string"""
+    return dt.isoformat() if dt else None
 
 
-def nix_to_est(timestamp: str, local_tz: pytz.timezone) -> datetime.datetime:
-    """Convert a Unix timestamp to Eastern Time."""
-    return utc_to_est(nix_to_utc(timestamp), local_tz)
+def timestamp_to_datetime(timestamp: int | None) -> datetime.datetime:
+    """Converts a timestamp to a datetime object"""
+    return (
+        datetime.datetime.fromtimestamp(timestamp, datetime.UTC) if timestamp else None
+    )
 
 
-def get_alerts(
-    mta_key: str, json_out: bool = False
-) -> Union[Dict[str, ReportType], List[AlertsResponse]]:
+def get_alert_type_by_times(now: datetime.datetime, period) -> str:
+    """
+    Returns the alert type based on its period relative to the current time.
+    """
+    # TODO: convert to typed enum
+    start, end = period.get("start"), period.get("end")
+    alert_start = timestamp_to_datetime(start)
+    alert_end = timestamp_to_datetime(end)
+    if alert_end is None:
+        return "breaking"
+    if alert_end < now:
+        return "past"
+    if now < alert_start:
+        return "future"
+    return "current"
+
+
+def parse_text(mta_text: list[dict[str, str]]):
+    """Extracts and formats English text from MTA text data."""
+    en = list(filter(lambda textDict: textDict.get("language") == "en", mta_text))
+    if not en:
+        raise ValueError("No English text found in MTA text data")
+    text = en[0].get("text")
+    return text.replace("\\n\\n", " ")
+
+
+def get_stops(informd_entities) -> List[Stop]:
+    """Returns a list of Stop objects from informed entities."""
+    affected_stops = []
+    for stop in informd_entities:
+        stop_id = stop.get("stop_id")
+        if stop_id:
+            stop_name = stopLookup[stop_id].get("stop_name", str(stop_id))
+            stop = Stop(stop_id=stop_id, stop_name=stop_name)
+            affected_stops.append(stop)
+    return affected_stops
+
+
+def parse_entity(entity, alert_period, period, route_id) -> Report:
+    """Converts the MTA entity into the pydantic type"""
+    # TODO: improve concision
+    alert_id = entity["id"]
+    alert_start = datetime_to_iso8601(timestamp_to_datetime(period.get("start")))
+    alert_end = datetime_to_iso8601(timestamp_to_datetime(period.get("end")))
+    alert_type = entity["alert"]["transit_realtime.mercury_alert"]["alert_type"]
+    alert_created = datetime_to_iso8601(
+        timestamp_to_datetime(
+            entity["alert"]["transit_realtime.mercury_alert"]["created_at"]
+        )
+    )
+    alert_updated = datetime_to_iso8601(
+        timestamp_to_datetime(
+            entity["alert"]["transit_realtime.mercury_alert"]["updated_at"]
+        )
+    )
+    display_before_active = entity["alert"]["transit_realtime.mercury_alert"].get(
+        "display_before_active"
+    )
+    header_text = parse_text(entity["alert"]["header_text"]["translation"])
+    description_text = (
+        parse_text(entity["alert"]["description_text"]["translation"])
+        if entity["alert"].get("description_text")
+        else None
+    )
+    affected_stops = get_stops(entity["alert"].get("informed_entity"))
+
+    return Report(
+        # Deprecated Fields
+        start=alert_start,
+        end=alert_end,
+        report=header_text,
+        # New Fields
+        alert_id=alert_id,
+        route_id=route_id,
+        alert_period=alert_period,
+        alert_start=alert_start,
+        alert_end=alert_end,
+        alert_type=alert_type,
+        alert_created=alert_created,
+        alert_updated=alert_updated,
+        display_before_active=display_before_active,
+        header_text=header_text,
+        description_text=description_text,
+        affected_stops=affected_stops,
+    )
+
+
+@get("/api/alerts", response_model=List[AlertsResponse])
+async def alerts() -> List[AlertsResponse]:
     """Fetch and process alerts from the MTA API."""
-    local_tz = pytz.timezone("US/Eastern")
     uri = "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json"
-
     try:
         response = requests.get(uri, headers={"x-api-key": mta_key}, timeout=5)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         raise HTTPException(status_code=500, detail=f"MTA API Error - {str(e)}") from e
 
-    records = response.json().get("entity", [])
-
-    # Initialize train_dict with the strongly typed structure
-    train_dict: Dict[str, ReportType] = {
-        train: ReportType(current=[], future=[], past=[], breaking=[])
-        for train in ALL_TRAINS
-    }
-
-    now = local_tz.localize(datetime.datetime.now())
-
-    for record in records:
-        alert = record.get("alert", {})
-        informed_entities = alert.get("informed_entity", [])
-        active_period = alert.get("active_period", [{}])[0]
-
-        alert_start = (
-            nix_to_est(active_period.get("start", ""), local_tz)
-            if "start" in active_period
-            else None
-        )
-        alert_end = (
-            nix_to_est(active_period.get("end", ""), local_tz)
-            if "end" in active_period
-            else None
-        )
-        alert_type: Optional[str] = None
-
-        if alert_end is None:
-            alert_type = "breaking"
-        elif alert_end < now:
-            alert_type = "past"
-        elif now < alert_start:
-            alert_type = "future"
-        elif alert_start <= now <= alert_end:
-            alert_type = "current"
-
-        report_text = (
-            alert.get("header_text", {}).get("translation", [{}])[0].get("text", "")
-        )
-        combined_report = Report(
-            start=alert_start.isoformat() if alert_start else None,
-            end=alert_end.isoformat() if alert_end else None,
-            report=report_text,
-        )
-
-        for entity in informed_entities:
-            train = entity.get("route_id")
-            if train in train_dict and alert_type in train_dict[train]:
-                train_dict[train][alert_type].append(combined_report)
-
-    if json_out:
-        return train_dict
-    else:
-        return [
-            AlertsResponse(train=train, all_reports=alerts)
-            for train, alerts in train_dict.items()
-        ]
+    entities = response.json().get("entity", [])
+    now = datetime.datetime.now(datetime.UTC)
+    return group_alerts_by_train_and_type(entities, now)
 
 
-@get("/api/alerts", response_model=List[AlertsResponse])
-async def alerts(json_out: bool = True) -> List[AlertsResponse]:
-    """API endpoint to fetch subway alerts."""
-    mta_key = os.getenv("mta_key")
-    if not mta_key:
-        raise HTTPException(status_code=500, detail="MTA API key not found.")
-    return get_alerts(mta_key=mta_key, json_out=json_out)
-
-
+load_dotenv()
+mta_key = os.getenv("MTA_KEY")
 app = Litestar([alerts])

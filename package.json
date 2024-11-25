@@ -6,7 +6,7 @@
     "node": "20.x"
   },
   "scripts": {
-    "litestar-dev": "pipenv run litestar --app api.index:app run -r -p 8000",
+    "litestar-dev": "pipenv run litestar --app api.index:app run -r -d -p 8000",
     "next-dev": "next dev",
     "dev": "concurrently \"npm run next-dev\" \"npm run litestar-dev\"",
     "build": "next build",
