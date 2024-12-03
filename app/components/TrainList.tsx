@@ -1,28 +1,11 @@
 'use client'
 import { train_colors } from 'app/utils/helpers'
-import { useEffect, useState } from 'react'
-import ReportList, { emptyTrainReport, IncomingType, TrainListProps } from './ReportList'
+import { components } from '../types'
+import ReportList from './ReportList'
 
-export function TrainList() {
-  const [isLoading, setLoading] = useState(true)
-  const [isError, setError] = useState(false)
-  const [data, setData] = useState<IncomingType[]>(emptyTrainReport())
+type AlertsResponse = components['schemas']['AlertsResponse']
 
-  useEffect(() => {
-    fetch('/api/alerts', { next: { revalidate: 10 } })
-      .then(async res => {
-        try {
-          const json = await res.json()
-          setData(json)
-        } catch (err) {
-          setError(true)
-          console.error('On Json Fetch', err)
-        }
-      })
-      .catch(err => console.error(err))
-      .finally(() => setLoading(false))
-  }, [])
-
+export function TrainList({ alerts }: { alerts: AlertsResponse[] }) {
   return (
     <div className="mx-3 sm:mx-auto sm:w-2/3">
       <div className="grid grid-cols-5 gap-x-6 gap-y-2 sm:gap-x-20 sm:gap-y-2">
@@ -34,10 +17,10 @@ export function TrainList() {
         </div>
       </div>
 
-      {data.map((element, index) => {
-        const train: string = element.train
-        const reports: TrainListProps = element.all_reports
-        const trainStyle: string = train_colors(train)
+      {alerts.map((alert, index) => {
+        const train: string = alert.train
+        const reports = alert.all_reports
+        const trainStyle: string | undefined = train_colors(train)
         return (
           <div
             key={index}
@@ -49,12 +32,9 @@ export function TrainList() {
               </h1>
             </div>
             <div className="col-span-4 my-auto flex-row items-center">
-              {isError ? (
-                <h1 className="text-red-500">Error</h1>
-              ) : (
+              {reports && (
                 <ReportList
                   reports={reports}
-                  isLoading={isLoading}
                   pclassName={'my-1'}
                 />
               )}
