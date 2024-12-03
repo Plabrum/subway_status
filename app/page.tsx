@@ -7,7 +7,7 @@ type AlertsResponse = components['schemas']['AlertsResponse']
 async function getData(): Promise<AlertsResponse[]> {
   const response = await fetch(getFullBackendURL() + '/api/alerts', { next: { revalidate: 600 } })
   if (!response.ok) {
-    throw new Error('Failed to fetch alerts')
+    return []
   }
   return await response.json()
 }
