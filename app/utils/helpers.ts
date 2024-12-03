@@ -1,5 +1,5 @@
 export function getFullBackendURL(): string {
-  return process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://subway.plabrum'
+  return process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://subway.plabrum.com'
 }
 
 export function parse_time(isotime: string): string {

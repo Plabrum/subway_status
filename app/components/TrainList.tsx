@@ -1,11 +1,11 @@
 'use client'
 import { train_colors } from 'app/utils/helpers'
-import ReportList from './ReportList'
 import { components } from '../types'
+import ReportList from './ReportList'
 
 type AlertsResponse = components['schemas']['AlertsResponse']
 
-export function TrainList({ data }: { data: AlertsResponse[] }) {
+export function TrainList({ alerts }: { alerts: AlertsResponse[] }) {
   return (
     <div className="mx-3 sm:mx-auto sm:w-2/3">
       <div className="grid grid-cols-5 gap-x-6 gap-y-2 sm:gap-x-20 sm:gap-y-2">
@@ -17,9 +17,9 @@ export function TrainList({ data }: { data: AlertsResponse[] }) {
         </div>
       </div>
 
-      {data.map((element, index) => {
-        const train: string = element.train
-        const reports = element.all_reports
+      {alerts.map((alert, index) => {
+        const train: string = alert.train
+        const reports = alert.all_reports
         const trainStyle: string | undefined = train_colors(train)
         return (
           <div
@@ -32,10 +32,12 @@ export function TrainList({ data }: { data: AlertsResponse[] }) {
               </h1>
             </div>
             <div className="col-span-4 my-auto flex-row items-center">
-              <ReportList
-                reports={reports}
-                pclassName={'my-1'}
-              />
+              {reports && (
+                <ReportList
+                  reports={reports}
+                  pclassName={'my-1'}
+                />
+              )}
             </div>
           </div>
         )

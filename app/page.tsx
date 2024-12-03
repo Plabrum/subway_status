@@ -5,11 +5,11 @@ import { getFullBackendURL } from './utils/helpers'
 type AlertsResponse = components['schemas']['AlertsResponse']
 
 async function getData(): Promise<AlertsResponse[]> {
-  const response = await fetch(getFullBackendURL() + '/api/alerts')
+  const response = await fetch(getFullBackendURL() + '/api/alerts', { next: { revalidate: 600 } })
   if (!response.ok) {
     throw new Error('Failed to fetch alerts')
   }
-  return response.json()
+  return await response.json()
 }
 
 export default async function Page() {
@@ -19,7 +19,7 @@ export default async function Page() {
       <main className="font-bold text-white">
         <h1 className="p-8 text-center font-mono text-4xl">Instant MTA Subway Information</h1>
         <div className="">
-          <TrainList data={data} />
+          <TrainList alerts={data} />
         </div>
       </main>
       <div className="my-8">

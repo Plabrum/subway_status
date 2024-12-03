@@ -28,20 +28,45 @@ export interface components {
         /** AlertsResponse */
         AlertsResponse: {
             train: string;
-            all_reports: components["schemas"]["ReportType"];
+            all_reports?: components["schemas"]["ReportType"];
         };
         /** Report */
         Report: {
-            start?: null | string;
+            start: string;
             end?: null | string;
-            report?: null | string;
+            report: string;
+            alert_id: string;
+            route_id: string;
+            affected_stops: components["schemas"]["Stop"][];
+            alert_period: string;
+            alert_start: string;
+            alert_end?: null | string;
+            alert_type: string;
+            alert_created: string;
+            alert_updated: string;
+            display_before_active?: null | number;
+            header_text: string;
+            description_text?: null | string;
         };
-        /** ReportType */
+        /**
+         * ReportType
+         * @default {
+         *       "past": [],
+         *       "current": [],
+         *       "future": [],
+         *       "breaking": []
+         *     }
+         */
         ReportType: {
+            past: components["schemas"]["Report"][];
             current: components["schemas"]["Report"][];
             future: components["schemas"]["Report"][];
-            past: components["schemas"]["Report"][];
             breaking: components["schemas"]["Report"][];
+        };
+        /** Stop */
+        Stop: {
+            stop_id: string;
+            stop_name: string;
         };
     };
     responses: never;
@@ -54,9 +79,7 @@ export type $defs = Record<string, never>;
 export interface operations {
     ApiAlertsAlerts: {
         parameters: {
-            query?: {
-                json_out?: boolean;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -70,21 +93,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AlertsResponse"][];
-                };
-            };
-            /** @description Bad request syntax or unsupported method */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        status_code: number;
-                        detail: string;
-                        extra?: null | {
-                            [key: string]: unknown;
-                        } | unknown[];
-                    };
                 };
             };
         };
