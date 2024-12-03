@@ -4,14 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "*"
 datetime = "*"
-pytz = "*"
 python-dotenv = "*"
 requests = "*"
-fastapi = "*"
 pydantic = "*"
 uvicorn = "*"
+litestar = "*"
 
 [dev-packages]
 ipykernel = "*"
