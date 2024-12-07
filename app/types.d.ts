@@ -28,7 +28,14 @@ export interface components {
         /** AlertsResponse */
         AlertsResponse: {
             train: string;
-            all_reports?: components["schemas"]["ReportType"];
+            /** @default [] */
+            past: components["schemas"]["Report"][];
+            /** @default [] */
+            current: components["schemas"]["Report"][];
+            /** @default [] */
+            future: components["schemas"]["Report"][];
+            /** @default [] */
+            breaking: components["schemas"]["Report"][];
         };
         /** Report */
         Report: {
@@ -47,21 +54,6 @@ export interface components {
             display_before_active?: null | number;
             header_text: string;
             description_text?: null | string;
-        };
-        /**
-         * ReportType
-         * @default {
-         *       "past": [],
-         *       "current": [],
-         *       "future": [],
-         *       "breaking": []
-         *     }
-         */
-        ReportType: {
-            past: components["schemas"]["Report"][];
-            current: components["schemas"]["Report"][];
-            future: components["schemas"]["Report"][];
-            breaking: components["schemas"]["Report"][];
         };
         /** Stop */
         Stop: {

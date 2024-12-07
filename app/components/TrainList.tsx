@@ -18,9 +18,7 @@ export function TrainList({ alerts }: { alerts: AlertsResponse[] }) {
       </div>
 
       {alerts.map((alert, index) => {
-        const train: string = alert.train
-        const reports = alert.all_reports
-        const trainStyle: string | undefined = train_colors(train)
+        const trainStyle: string | undefined = train_colors(alert.train)
         return (
           <div
             key={index}
@@ -28,16 +26,17 @@ export function TrainList({ alerts }: { alerts: AlertsResponse[] }) {
           >
             <div className="col-span-1 flex items-center text-center">
               <h1 className={`mx-auto inline-block rounded-full border-2 px-4 py-2 text-xl sm:text-3xl ${trainStyle}`}>
-                {train}
+                {alert.train}
               </h1>
             </div>
             <div className="col-span-4 my-auto flex-row items-center">
-              {reports && (
-                <ReportList
-                  reports={reports}
-                  pclassName={'my-1'}
-                />
-              )}
+              <ReportList
+                breaking={alert.breaking}
+                current={alert.current}
+                future={alert.future}
+                past={alert.past}
+                pclassName={'my-1'}
+              />
             </div>
           </div>
         )

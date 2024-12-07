@@ -1,30 +1,12 @@
+import { DateTime } from 'luxon'
+
 export function getFullBackendURL(): string {
   return process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://subway.plabrum.com'
 }
 
-export function parse_time(isotime: string): string {
-  interface mmDict<T> {
-    [Key: string]: T
-  }
-  const MM: mmDict<string> = {
-    '01': 'Jan',
-    '02': 'Feb',
-    '03': 'Mar',
-    '04': 'Apr',
-    '05': 'May',
-    '06': 'Jun',
-    '07': 'Jul',
-    '08': 'Aug',
-    '09': 'Sep',
-    '10': 'Oct',
-    '11': 'Nov',
-    '12': 'Dec'
-  }
-
-  const month = MM[isotime.slice(5, 7)]
-  const day = Number(isotime.slice(8, 10))
-  const time = isotime.slice(11, 16)
-  return `${month}  ${day} ${time}`
+export function parseTime(isotime: string): string {
+  const date = DateTime.fromISO(isotime).setZone('local')
+  return date.toFormat('MMM d h:mma')
 }
 
 export function train_colors(train_name: string): string | undefined {

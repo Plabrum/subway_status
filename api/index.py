@@ -5,57 +5,12 @@ import requests
 from dotenv import load_dotenv
 from litestar import Litestar, get
 from litestar.exceptions import HTTPException
-from pydantic import BaseModel
 
 from api._helpers.Alerts import group_alerts_by_train_and_type
-from api._helpers.types import AlertEntity
+from api._helpers.types import AlertEntity, AlertsResponse
 
 load_dotenv()
 mta_key: str | None = os.getenv("MTA_KEY")
-
-
-# Pydantic models for response validation
-class Stop(BaseModel):
-    """Represents an MTA stop"""
-
-    stop_id: str
-    stop_name: str
-
-
-class Report(BaseModel):
-    """
-    Represents an individual alert report with details about
-    the alert's start time, end time, and the description.
-    """
-
-    start: str
-    end: str | None
-    report: str
-
-    alert_id: str
-    route_id: str
-    affected_stops: list[Stop]
-    alert_period: str
-    alert_start: str
-    alert_end: str | None
-    alert_type: str
-    alert_created: str
-    alert_updated: str
-    display_before_active: int | None
-    header_text: str
-    description_text: str | None
-
-
-class AlertsResponse(BaseModel):
-    """
-    Represents the alerts associated with a specific train, organized by alert types.
-    """
-
-    train: str
-    past: list[Report] = []
-    current: list[Report] = []
-    future: list[Report] = []
-    breaking: list[Report] = []
 
 
 @get("/api/alerts", response_model=list[AlertsResponse])

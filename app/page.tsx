@@ -15,7 +15,7 @@ async function getData(): Promise<AlertsResponse[]> {
 export default async function Page() {
   const data = await getData() // Add type here
   return (
-    <div className="h-screen bg-gray-900">
+    <div className="h-full bg-gray-900">
       <main className="font-bold text-white">
         <h1 className="p-8 text-center font-mono text-4xl">Instant MTA Subway Information</h1>
         <div className="">
