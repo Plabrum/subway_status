@@ -14,11 +14,17 @@
     "editor.formatOnSave":true
   },
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave":true
   },
   "pylint.enabled": true,
   "typescript.tsdk": "node_modules/typescript/lib",
-  "pylint.importStrategy": "fromEnvironment",
   "editor.detectIndentation": true,
-  "python.terminal.activateEnvironment": true
+  "python.analysis.typeEvaluation.enableReachabilityAnalysis": true,
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.completeFunctionParens": true,
+  "python.analysis.generateWithTypeAnnotation": true,
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.typeEvaluation.strictDictionaryInference": true,
+  "python.analysis.typeCheckingMode": "strict",
 }
