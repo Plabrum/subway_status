@@ -1,9 +1,15 @@
 import datetime
 
-from api.index import AlertsResponse, Report, Stop
-
 from .stoplookup import stopLookup
-from .types import AlertEntity, AlertPeriod, InformedEntity, MTAText
+from .types import (
+    AlertEntity,
+    AlertPeriod,
+    AlertsResponse,
+    InformedEntity,
+    MTAText,
+    Report,
+    Stop,
+)
 
 
 # Helpers
@@ -30,10 +36,7 @@ def group_alerts_by_train_and_type(
             if route not in routes_dict:
                 routes_dict[route] = AlertsResponse(train=route)
             for alert, periods in alert_periods:
-                try:
-                    report = parse_entity(entity, alert, periods, route)
-                except Exception as e:
-                    raise e
+                report = parse_entity(entity, alert, periods, route)
                 getattr(routes_dict[route], alert).append(report)
     return list(routes_dict.values())
 
@@ -73,7 +76,8 @@ def parse_text(mta_text: MTAText) -> str:
     translation = mta_text.get("translation", [])
     en = list(filter(lambda textdict: textdict.get("language") == "en", translation))
     text = en[0].get("text") if en else None
-    if not text:
+    if text is None:
+        print("MTA TEXT", mta_text)
         raise ValueError("No English text found in MTA text data")
     return text.replace("\\n\\n", " ")
 
