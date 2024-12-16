@@ -1,6 +1,25 @@
+from enum import Enum
 from typing import List, Optional, TypedDict
 
 from pydantic import BaseModel
+
+
+class StatusEnum(Enum):
+    NORMAL = "normal"
+    WARNING = "warning"
+    SUSPENDED = "suspended"
+
+
+class PeriodEnum(Enum):
+    Breaking = "breaking"
+    Current = "current"
+    Past = "past"
+    Future = "future"
+
+
+class TrainStatus(BaseModel):
+    train: str
+    status: StatusEnum
 
 
 # Pydantic models for response validation
@@ -16,10 +35,6 @@ class Report(BaseModel):
     Represents an individual alert report with details about
     the alert's start time, end time, and the description.
     """
-
-    start: str
-    end: str | None
-    report: str
 
     alert_id: str
     route_id: str
