@@ -4,6 +4,8 @@ import SubwayIcon from '@/app/components/SubwayIcon'
 import { AlertsResponse } from '@/app/types'
 
 import { getFullBackendURL, ROLLOUT, TRAIN_ORDER } from '@/app/utils/helpers'
+import { ChevronLeft } from 'lucide-react'
+import Link from 'next/link'
 
 async function getSubwayInfo(id: string): Promise<AlertsResponse | null> {
   const response = await fetch(getFullBackendURL() + `/api/alerts/${id}`, { next: { revalidate: 60 } })
@@ -24,8 +26,16 @@ export default async function SubwayPage({ params }: { params: { id: string } })
 
   return (
     <div className="flex w-full flex-col gap-y-4">
-      <div className="mr-auto flex flex-row items-center gap-x-4">
-        <h1 className="text-2xl font-bold">Subway Line</h1>
+      <div className="mr-auto flex flex-row items-center gap-x-1">
+        <Link
+          href="/"
+          className="m-0 aspect-square"
+        >
+          {/* <div className="flex items-center gap-x-2 text-2xl"> */}
+          <ChevronLeft />
+          {/* </div> */}
+        </Link>
+        <h1 className="mr-4 text-2xl font-bold">Subway Line</h1>
         <SubwayIcon
           train={params.id}
           className="h-10 text-2xl"

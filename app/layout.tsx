@@ -9,7 +9,15 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Subway Status',
-  description: 'Real Time MTA Subway informtion'
+  description: 'Real Time MTA Subway informtion',
+  themeColor: '#111827',
+  keywords: 'MTA, NYC, Subway, Status, Alerts',
+  authors: [{ name: 'Phil Labrum', url: 'https://plabrum.com' }],
+  openGraph: {
+    title: 'Subway Status',
+    description: 'Real Time MTA Subway informtion',
+    creators: ['Phil Labrum']
+  }
 }
 
 export default function RootLayout({
@@ -27,9 +35,9 @@ export default function RootLayout({
         <div className="flex min-h-full flex-col text-white">
           <Link
             href={'/'}
-            className="mx-auto p-4 sm:p-8"
+            className="mx-auto w-full py-4 sm:p-8"
           >
-            <h1 className="text-center font-mono text-2xl sm:text-4xl">MTA Subway Information</h1>
+            <h1 className="text-center text-3xl font-bold sm:text-4xl">MTA Subway Information</h1>
           </Link>
           {/* Content */}
           <main className="flex flex-grow flex-col items-center text-white">
