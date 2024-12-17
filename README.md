@@ -1,4 +1,12 @@
-## Getting Started
+# Subway Status
+
+This App uses the GTFS feeds from the MTA to display system alerts by route. Visit the live site: [https://subway.plabrum.com](https://subway.plabrum.com)
+
+<img src="https://github.com/user-attachments/assets/d29eb3ef-1a9a-4078-becd-b16e437dce47" alt="Home Screen" width="300">
+
+<img src="https://github.com/user-attachments/assets/52d04141-13f6-4760-96aa-4cf936188390" alt="Home Screen" width="300">
+
+## Developing
 
 This project has a Nextjs frontend with a Python Flask backend. Developing locally requires both to be simultaneously run. The python server runs on port `8000` while the Next server runs on port `3000`. The `concurrently` package helps running both from the cli clearly, with a `[0]`prepending backend logs and a `[1]` prepending frontend logs.
 
