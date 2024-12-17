@@ -38,8 +38,8 @@ async def status() -> list[TrainStatus]:
     return get_status_for_trains(entities)
 
 
-@get("/api/alerts/{subway_line:str}", response_model=list[AlertsResponse])
-async def alerts(subway_line: str) -> list[AlertsResponse]:
+@get("/api/alerts/{subway_line:str}", response_model=AlertsResponse)
+async def alerts(subway_line: str) -> AlertsResponse | None:
     """
     Fetch and process alerts from the MTA API, filtering by subway line.
 
@@ -50,7 +50,11 @@ async def alerts(subway_line: str) -> list[AlertsResponse]:
         A list of filtered alerts based on the subway line.
     """
     entities = fetchJSONAlertsFromMTA()
-    return group_alerts_by_train_and_type(entities, [subway_line])
+    grouped_alerts = group_alerts_by_train_and_type(entities, [subway_line])
+    if len(grouped_alerts) == 1:
+        return grouped_alerts[0]
+    else:
+        return None
 
 
 app = Litestar([all_alerts, alerts, status])

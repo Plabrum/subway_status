@@ -21,7 +21,7 @@ from .types import (
 ACTIVE_ALERTS = [PeriodEnum.Breaking, PeriodEnum.Current]
 
 
-def isEnumGreater(a: StatusEnum, b: StatusEnum):
+def is_enum_greater(a: StatusEnum, b: StatusEnum):
     get_value = {StatusEnum.NORMAL: 0, StatusEnum.WARNING: 1, StatusEnum.SUSPENDED: 2}
     return get_value[a] > get_value[b]
 
@@ -45,7 +45,7 @@ def get_status_for_trains(entities: list[AlertEntity]) -> list[TrainStatus]:
         status = map_status_to_enum(alert_type)
 
         routes_with_increases = filter(
-            lambda r: isEnumGreater(status, statuses.get(r, StatusEnum.NORMAL)),
+            lambda r: is_enum_greater(status, statuses.get(r, StatusEnum.NORMAL)),
             affected_routes,
         )
 
@@ -69,6 +69,11 @@ def map_status_to_enum(
         # Default to Warning for all other statuses
         case _:
             return StatusEnum.WARNING
+
+
+def is_alert_more_than_14_days_away(period: AlertPeriod) -> bool:
+    days_away = datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=14)
+    return timestamp_to_datetime(period["start"]) > days_away
 
 
 def group_alerts_by_train_and_type(
@@ -97,9 +102,18 @@ def group_alerts_by_train_and_type(
                 continue
             if route not in routes_dict:
                 routes_dict[route] = AlertsResponse(train=route)
-            for alert, periods in alert_periods:
-                report = parse_entity(entity, str(alert), periods, route)
-                getattr(routes_dict[route], str(alert)).append(report)
+            for alert, period in alert_periods:
+                if is_alert_more_than_14_days_away(period):
+                    continue
+                report = parse_entity(entity, alert.value, period, route)
+                getattr(routes_dict[route], alert.value).append(report)
+
+    for _, alert_repsonse in routes_dict.items():
+        alert_repsonse.breaking.sort(key=lambda x: x.alert_start)
+        alert_repsonse.current.sort(key=lambda x: x.alert_start)
+        alert_repsonse.future.sort(key=lambda x: x.alert_start)
+        alert_repsonse.past.sort(key=lambda x: x.alert_start, reverse=True)
+
     return list(routes_dict.values())
 
 
