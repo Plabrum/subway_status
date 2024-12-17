@@ -3,7 +3,7 @@ import { TrainStatus } from './types'
 import { getFullBackendURL, TRAIN_ORDER } from './utils/helpers'
 
 async function getData(): Promise<TrainStatus[]> {
-  const response = await fetch(getFullBackendURL() + '/api/status', { next: { revalidate: 30 } })
+  const response = await fetch(getFullBackendURL() + '/api/status', { next: { revalidate: 60 } })
   if (!response.ok) {
     return []
   }
