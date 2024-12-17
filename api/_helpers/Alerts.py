@@ -1,5 +1,6 @@
 import datetime
-import re
+
+# import re
 from collections import defaultdict
 from typing import Literal
 
@@ -140,7 +141,8 @@ def parse_text(mta_text: MTAText) -> str:
     if text is None:
         print("MTA TEXT", mta_text)
         raise ValueError("No English text found in MTA text data")
-    return re.sub(r"(?<!\n)\n(?!\n)", " ", text).replace("\n\n", "\n")
+    # return re.sub(r"(?<!\n)\n(?!\n)", " ", text).replace("\n\n", "\n")
+    return text
 
 
 def get_stops(informed_entities: list[InformedEntity]) -> list[Stop]:
