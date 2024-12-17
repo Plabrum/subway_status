@@ -27,13 +27,13 @@ export default function RootLayout({
         <div className="flex min-h-full flex-col text-white">
           <Link
             href={'/'}
-            className="mx-auto p-8"
+            className="mx-auto p-4 sm:p-8"
           >
-            <h1 className="text-center font-mono text-4xl">MTA Subway Information</h1>
+            <h1 className="text-center font-mono text-2xl sm:text-4xl">MTA Subway Information</h1>
           </Link>
           {/* Content */}
           <main className="flex flex-grow flex-col items-center text-white">
-            <div className="w-full px-6 sm:w-5/6">{children}</div>
+            <div className="w-full px-4 sm:w-5/6">{children}</div>
           </main>
           {/* Footer */}
           <Footer />
