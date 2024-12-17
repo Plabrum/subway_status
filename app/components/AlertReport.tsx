@@ -88,7 +88,7 @@ export default function AlertReport({ report }: AlertReportProps) {
           {report.description_text && (
             <div className="rounded bg-gray-700 p-2">
               <h3 className="font-semibold">Description</h3>
-              <p>{report.description_text}</p>
+              <p className="text-sm">{report.description_text}</p>
             </div>
           )}
 
