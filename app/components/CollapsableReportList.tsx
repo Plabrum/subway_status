@@ -1,9 +1,8 @@
 'use client'
-import { Button } from '@/components/ui/button'
-import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 import { TrainReport } from '../types'
 import AlertReport from './AlertReport'
+import ChevronButton from './ChevronButton'
 
 type Props = {
   title: string
@@ -18,14 +17,10 @@ function CollapsableReportList({ title, reportArray }: Props) {
         <h3 className="text-xl font-bold">
           {title} ({reportArray.length})
         </h3>
-        <Button
+        <ChevronButton
           onClick={() => setIsOpen(!isOpen)}
-          variant="ghost"
-          size="sm"
-          className="text-gray-400 hover:bg-slate-400"
-        >
-          {isOpen ? <ChevronUp className="h-2 w-2" /> : <ChevronDown className="h-4 w-4" />}
-        </Button>
+          isDown={isOpen}
+        />
       </div>
       {isOpen &&
         reportArray.map((report, index) => (
