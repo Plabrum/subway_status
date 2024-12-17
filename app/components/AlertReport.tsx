@@ -1,13 +1,13 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ChevronDown, ChevronUp, MapPin } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 import { useState } from 'react'
 import { Stop, TrainReport } from '../types'
 import { parseTime } from '../utils/helpers'
+import ChevronButton from './ChevronButton'
 
 interface AlertReportProps {
   report: TrainReport
@@ -31,24 +31,35 @@ export default function AlertReport({ report }: AlertReportProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   return (
     <Card className="w-full bg-gray-800 text-gray-100">
-      <CardHeader onClick={() => setIsExpanded(!isExpanded)}>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-md sm:text-xl">{report.header_text}</h1>
+      <CardHeader
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="relative p-3 sm:min-h-28 sm:p-4"
+      >
+        <div className="absolute right-0 top-1/2 -translate-y-1/2">
+          <ChevronButton
+            onClick={() => setIsExpanded(!isExpanded)}
+            isDown={isExpanded}
+            className="mr-1 h-5 w-5 sm:h-8 sm:w-8"
+          />
+        </div>
+        <CardTitle className="flex grow flex-col justify-between gap-y-2">
+          {/* <div className="flex w-full flex-row items-center justify-between"> */}
+          <h1 className="text-md mr-4 sm:text-xl">{report.header_text}</h1>
+          {/* </div> */}
+          <div className="flex flex-row justify-between">
             <Badge
               variant="destructive"
-              className="mr-auto h-5 bg-red-700 text-white sm:h-6"
+              className="h-5 bg-red-700 text-white sm:h-6"
             >
               {report.alert_type}
             </Badge>
+            <Badge
+              variant="outline"
+              className="h-5 font-normal text-white sm:h-6"
+            >
+              {parseTime(report.alert_start)}
+            </Badge>
           </div>
-          <Button
-            variant="ghost"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="hidden text-gray-400 hover:bg-slate-400 sm:block"
-          >
-            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
         </CardTitle>
       </CardHeader>
       {isExpanded && (
@@ -84,7 +95,7 @@ export default function AlertReport({ report }: AlertReportProps) {
           {report.affected_stops.length > 0 && (
             <div>
               <h3 className="mb-2 font-semibold text-gray-300">Affected Stops</h3>
-              <ScrollArea className="w-full rounded-md border border-gray-200 p-4 dark:border-gray-700">
+              <ScrollArea className="w-full rounded-md border border-gray-200 p-4">
                 <div className="space-y-2">
                   {report.affected_stops.map((stop, index) => (
                     <StopInfo
