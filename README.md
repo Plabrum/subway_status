@@ -1,6 +1,6 @@
 # Subway Status
 
-This App uses the GTFS feeds from the MTA to display system alerts by route. Visit the live site: [https://subway.plabrum.com](https://subway.plabrum.com)
+This App uses the GTFS feeds from the MTA to display system alerts by route. Motivated by getting blindsided by the L train being out of service. Visit the live site: [https://subway.plabrum.com](https://subway.plabrum.com)
 
 <img src="https://github.com/user-attachments/assets/d29eb3ef-1a9a-4078-becd-b16e437dce47" alt="Home Screen" width="300">
 
@@ -8,7 +8,7 @@ This App uses the GTFS feeds from the MTA to display system alerts by route. Vis
 
 ## Developing
 
-This project has a Nextjs frontend with a Python Flask backend. Developing locally requires both to be simultaneously run. The python server runs on port `8000` while the Next server runs on port `3000`. The `concurrently` package helps running both from the cli clearly, with a `[0]`prepending backend logs and a `[1]` prepending frontend logs.
+This project has a Nextjs 14 frontend with a Python [`litestar`](https://litestar.dev) backend. Developing locally requires both to be simultaneously run. The python server runs on port `8000` while the Next server runs on port `3000`. The `concurrently` package helps running both from the cli clearly, with a `[0]`prepending backend logs and a `[1]` prepending frontend logs.
 
 The project runs on `node 20.x.x`
 
@@ -20,25 +20,24 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+### Generating Types
+
+Litestar provides openApi schema generation, which can be consumed by openapi-typescript to generate tyepscript types. 
+
+To generate types you can run:
+
+```bash
+yarn generate-types
+```
+
 ### NextJS
 
-We are using the app router on Next14. Next15 will not be considered until React 19 points to a stable version (currently pointing at a canary release candidate).
+Next provies built-in Static site generation (SSG) as well as incremental static re-rendering (ISR). This is particularily helpful for this project as the underlying data fetched from the backend is universal but temporally bound - fresh data for one user is a helpful update for all users. Using the next `fetch( ..., {revalidate: limit})` we can set a universal limit on data staleness. 
 
 #### TailwindCss + Shadcn
 
 This styling combo allows for rapid, component-driven development.
 
-### Generating Open Api Types
-
-To allow a type-safe api interface between the python backend and the typescript frontend, we can utilize open-api type generation.
-
-```bash
-yarn run generate
-```
-
-This will generate typescript types in the `/types/` directory.
-
-https://fastapi.tiangolo.com/advanced/generate-clients/#generate-client-code
 
 ## Deployment
 
