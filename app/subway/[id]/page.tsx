@@ -5,7 +5,7 @@ import { AlertsResponse } from '@/app/types'
 
 import { getFullBackendURL, ROLLOUT, TRAIN_ORDER } from '@/app/utils/helpers'
 
-export async function getSubwayInfo(id: string): Promise<AlertsResponse | null> {
+async function getSubwayInfo(id: string): Promise<AlertsResponse | null> {
   const response = await fetch(getFullBackendURL() + `/api/alerts/${id}`, { next: { revalidate: 60 } })
   if (!response.ok) {
     return null
