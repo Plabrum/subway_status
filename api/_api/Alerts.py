@@ -1,12 +1,27 @@
 import datetime
+from typing import Literal
+
 from .source_types import AlertEntity, AlertPeriod, InformedEntity, MTAText
 from .stoplookup import stopLookup
-from .types import AlertsResponse, PeriodEnum, Report, Stop
+from .types import AlertsResponse, PeriodEnum, Report, StatusEnum, Stop
 
 
 def is_alert_more_than_14_days_away(period: AlertPeriod) -> bool:
     days_away = datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=14)
     return timestamp_to_datetime(period["start"]) > days_away
+
+
+def map_status_to_enum(
+    status: str,
+) -> Literal[StatusEnum.WARNING, StatusEnum.SUSPENDED]:
+    cancelation_keywords = ["Suspended", "Cancellations", "No Scheduled Service"]
+    match status:
+        # Check if any cancellation keyword is a substring of the status
+        case status if any(keyword in status for keyword in cancelation_keywords):
+            return StatusEnum.SUSPENDED
+        # Default to Warning for all other statuses
+        case _:
+            return StatusEnum.WARNING
 
 
 def group_alerts_by_train_and_type(
@@ -71,13 +86,12 @@ def get_alert_type_by_times(now: datetime.datetime, period: AlertPeriod) -> Peri
         raise ValueError("No start time found in alert period")
 
     alert_end = timestamp_to_datetime(end) if end else None
-    if alert_end is None:
-        return PeriodEnum.Breaking
-    if alert_end < now:
-        return PeriodEnum.Past
-    if now < alert_start:
+    if alert_start >= now:
         return PeriodEnum.Future
-    return PeriodEnum.Current
+    elif alert_end and alert_end < now:
+        return PeriodEnum.Past
+    else:
+        return PeriodEnum.Current
 
 
 def parse_text(mta_text: MTAText) -> str:
@@ -147,4 +161,7 @@ def parse_entity(
         header_text=parse_text(entity["alert"]["header_text"]),
         description_text=description_text,
         affected_stops=get_stops(entity["alert"].get("informed_entity", [])),
+        alert_status=map_status_to_enum(
+            entity["alert"]["transit_realtime.mercury_alert"]["alert_type"]
+        ),
     )

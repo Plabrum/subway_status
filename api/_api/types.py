@@ -4,6 +4,8 @@ from pydantic import BaseModel
 
 
 class StatusEnum(Enum):
+    """Reduced Status set derived from the MTA alert_type str field"""
+
     NORMAL = "normal"
     WARNING = "warning"
     SUSPENDED = "suspended"
@@ -17,6 +19,8 @@ class PeriodEnum(Enum):
 
 
 class TrainStatus(BaseModel):
+    """Pairing of a train str and Status Enum for homepage"""
+
     train: str
     status: StatusEnum
 
@@ -40,6 +44,7 @@ class Report(BaseModel):
     affected_stops: list[Stop]
     alert_period: str
     alert_start: str
+    alert_status: StatusEnum
     alert_end: str | None
     alert_type: str
     alert_created: str
