@@ -1,30 +1,12 @@
 import datetime
 from collections import defaultdict
-from typing import Literal
-from api._api.Alerts import get_alert_type_by_times
+
+from api._api.Alerts import get_alert_type_by_times, map_status_to_enum
+
 from .source_types import AlertEntity
-
-
-from .types import (
-    PeriodEnum,
-    StatusEnum,
-    TrainStatus,
-)
+from .types import PeriodEnum, StatusEnum, TrainStatus
 
 ACTIVE_ALERTS = [PeriodEnum.Breaking, PeriodEnum.Current]
-
-
-def map_status_to_enum(
-    status: str,
-) -> Literal[StatusEnum.WARNING, StatusEnum.SUSPENDED]:
-    cancelation_keywords = ["Suspended", "Cancellations", "No Scheduled Service"]
-    match status:
-        # Check if any cancellation keyword is a substring of the status
-        case status if any(keyword in status for keyword in cancelation_keywords):
-            return StatusEnum.SUSPENDED
-        # Default to Warning for all other statuses
-        case _:
-            return StatusEnum.WARNING
 
 
 def is_enum_greater(a: StatusEnum, b: StatusEnum):
