@@ -78,6 +78,8 @@ export interface components {
             affected_stops: components["schemas"]["Stop"][];
             alert_period: string;
             alert_start: string;
+            /** @enum {string} */
+            alert_status: "normal" | "warning" | "suspended";
             alert_end?: null | string;
             alert_type: string;
             alert_created: string;
@@ -143,7 +145,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AlertsResponse"][];
+                    "application/json": null | components["schemas"]["AlertsResponse"];
                 };
             };
             /** @description Bad request syntax or unsupported method */
