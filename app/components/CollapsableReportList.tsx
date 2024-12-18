@@ -12,7 +12,7 @@ type Props = {
 function CollapsableReportList({ title, reportArray }: Props) {
   const [isOpen, setIsOpen] = useState(false)
   return (
-    <div className="mt-8 flex flex-col gap-y-4">
+    <div className="flex flex-col gap-y-4">
       <div className="flex flex-row items-center gap-x-2">
         <h3 className="text-xl font-bold">
           {title} ({reportArray.length})
