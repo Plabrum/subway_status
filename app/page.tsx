@@ -1,3 +1,4 @@
+import Header from './components/Header'
 import SubwayIcon from './components/SubwayIcon'
 import { TrainStatus } from './types'
 import { getFullBackendURL, TRAIN_ORDER } from './utils/helpers'
@@ -17,7 +18,9 @@ export default async function Page() {
     return subways.find(subway => subway.train == train) ?? normalStatus
   })
   return (
-    <>
+    <div className="">
+      <Header className="" />
+      {/* <div className=""> */}
       <h1 className="mx-4 mb-4 self-start text-xl font-bold">Routes</h1>
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-4 sm:gap-4 lg:grid-cols-8">
         {all_subways.map((subway, key) => (
@@ -27,7 +30,8 @@ export default async function Page() {
             status={subway.status}
           />
         ))}
+        {/* </div> */}
       </div>
-    </>
+    </div>
   )
 }
