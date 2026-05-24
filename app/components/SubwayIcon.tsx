@@ -14,6 +14,7 @@ export default function SubwayIcon({ train, status, className }: SubwayIconProps
   return (
     <Link
       href={`/subway/${train}`}
+      prefetch={false}
       className={cn(
         'text-bold relative mx-auto flex aspect-square h-16 items-center justify-center rounded-full text-3xl font-bold',
         train_colors(train),

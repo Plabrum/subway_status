@@ -8,7 +8,7 @@ import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 
 async function getSubwayInfo(id: string): Promise<AlertsResponse | null> {
-  const response = await fetch(getFullBackendURL() + `/api/alerts/${id}`, { next: { revalidate: 60 } })
+  const response = await fetch(getFullBackendURL() + `/api/alerts/${id}`, { next: { revalidate: 3600 } })
   if (!response.ok) {
     return null
   }
